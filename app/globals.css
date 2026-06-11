@@ -2,11 +2,17 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* 楷体替代：本地优先用系统楷体，线上 fallback 到 Noto Serif SC */
 @font-face {
   font-family: 'KaitiSC';
-  src: url('/fonts/Kaiti.ttc') format('truetype');
+  src: local('Kaiti SC'), local('STKaiti'), local('楷体');
   font-weight: normal;
   font-style: normal;
+}
+
+/* 线上环境 fallback：用 CSS 变量注入 Noto Serif SC */
+:root {
+  --font-kaiti: 'KaitiSC', var(--font-noto-serif-sc), 'Kaiti SC', 'STKaiti', serif;
 }
 
 @custom-variant dark (&:is(.dark *));

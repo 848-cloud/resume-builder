@@ -25,7 +25,7 @@ interface CompactThemeProps {
 }
 
 const SANS = "-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif"
-const KAITI = "'KaitiSC', 'Kaiti SC', 'STKaiti', serif"
+const KAITI = "var(--font-kaiti, 'KaitiSC', 'Kaiti SC', 'STKaiti', serif)"
 
 export default function CompactTheme({ data }: CompactThemeProps) {
   const { basicInfo, summary, workExperience, education, extraModules } = data
