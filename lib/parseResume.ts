@@ -35,12 +35,18 @@ export async function extractTextFromFile(file: File): Promise<string> {
 }
 
 async function extractFromPDF(file: File): Promise<string> {
-  // 动态加载 pdfjs-dist（避免 SSR 问题）
-  const pdfjsLib = await import('pdfjs-dist')
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+  // 使用 legacy build，禁用 Worker，避免跨域/CDN 加载失败问题
+  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
+  // 禁用 Worker，在主线程直接解析
+  pdfjsLib.GlobalWorkerOptions.workerSrc = ''
 
   const arrayBuffer = await file.arrayBuffer()
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+  const pdf = await pdfjsLib.getDocument({
+    data: arrayBuffer,
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    useSystemFonts: true,
+  }).promise
   const texts: string[] = []
 
   for (let i = 1; i <= pdf.numPages; i++) {
@@ -48,8 +54,8 @@ async function extractFromPDF(file: File): Promise<string> {
     const content = await page.getTextContent()
     const pageText = content.items
       .map((item: unknown) => {
-        const i = item as { str?: string }
-        return i.str ?? ''
+        const it = item as { str?: string }
+        return it.str ?? ''
       })
       .join(' ')
     texts.push(pageText)
