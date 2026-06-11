@@ -20,8 +20,13 @@ const notoSerifSC = Noto_Serif_SC({
 });
 
 export const metadata: Metadata = {
-  title: "简历排版工具",
-  description: "专为互联网产品经理设计的简历排版工具",
+  title: "Simple Resume · 简·历",
+  description: "Simple resume, clear story. 专为互联网产品经理设计的简历排版工具",
+  openGraph: {
+    title: "Simple Resume · 简·历",
+    description: "Simple resume, clear story.",
+    siteName: "Simple Resume",
+  },
 };
 
 export default function RootLayout({

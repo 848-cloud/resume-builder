@@ -73,45 +73,83 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 顶部导航 */}
-      <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">简历排版工具</h1>
-          <p className="text-sm text-gray-500 mt-0.5">专为互联网产品经理设计</p>
-        </div>
-        <Button
-          onClick={() => setShowCreate(true)}
-          className="bg-gray-900 hover:bg-gray-700 text-white"
-        >
-          + 新建简历
-        </Button>
-      </header>
+    <div className="min-h-screen bg-[#f7f6f2]">
 
-      {/* 内容区 */}
-      <main className="max-w-5xl mx-auto px-8 py-10">
+      {/* ── Hero 区域 ── */}
+      <section className="relative h-[480px] overflow-hidden">
+        {/* 背景图：自然绿叶 */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&q=80&auto=format&fit=crop')`,
+          }}
+        />
+        {/* 渐变遮罩：底部深 → 顶部浅，确保文字可读 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
+
+        {/* 内容 */}
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+          {/* 中文副标题 */}
+          <p className="text-white/60 text-sm tracking-[0.4em] mb-4 font-light">简 · 历</p>
+          {/* 品牌主名 */}
+          <h1
+            className="text-white font-bold tracking-tight mb-4"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', letterSpacing: '-0.02em' }}
+          >
+            Simple Resume
+          </h1>
+          {/* Slogan */}
+          <p className="text-white/70 text-base md:text-lg font-light tracking-wide mb-10">
+            Simple resume, clear story.
+          </p>
+          {/* CTA */}
+          <button
+            onClick={() => setShowCreate(true)}
+            className="px-8 py-3 bg-white text-gray-900 font-semibold text-sm rounded-full hover:bg-white/90 transition-all shadow-lg hover:shadow-xl active:scale-95"
+          >
+            创建简历
+          </button>
+        </div>
+      </section>
+
+      {/* ── 简历列表区域 ── */}
+      <main className="max-w-5xl mx-auto px-6 py-12">
+
         {loading ? (
-          <div className="flex items-center justify-center py-24 text-gray-400">加载中...</div>
+          <div className="flex items-center justify-center py-24 text-gray-400 text-sm">加载中...</div>
         ) : resumes.length === 0 ? (
           /* 空状态 */
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-              <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
+              <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">还没有简历</h2>
-            <p className="text-gray-400 mb-8">创建你的第一份简历，开启求职之旅</p>
-            <Button
+            <h2 className="text-lg font-semibold text-gray-600 mb-2">还没有简历</h2>
+            <p className="text-gray-400 text-sm mb-7">创建你的第一份简历，开启求职之旅</p>
+            <button
               onClick={() => setShowCreate(true)}
-              className="bg-gray-900 hover:bg-gray-700 text-white px-8"
+              className="px-7 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-700 transition-colors"
             >
               + 新建简历
-            </Button>
+            </button>
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-500 mb-6">共 {resumes.length} 份简历</p>
+            {/* 列表标题行 */}
+            <div className="flex items-center justify-between mb-7">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">我的简历</h2>
+                <p className="text-sm text-gray-400 mt-0.5">共 {resumes.length} 份</p>
+              </div>
+              <button
+                onClick={() => setShowCreate(true)}
+                className="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-700 transition-colors"
+              >
+                + 新建简历
+              </button>
+            </div>
+            {/* 卡片网格 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {resumes.map((resume) => (
                 <ResumeCard
@@ -128,7 +166,12 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* 新建简历弹窗 */}
+      {/* ── 页脚 ── */}
+      <footer className="text-center py-8 text-xs text-gray-400 border-t border-gray-200">
+        © 2025 Simple Resume · 简·历 &nbsp;·&nbsp; Simple resume, clear story.
+      </footer>
+
+      {/* ── 新建简历弹窗 ── */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -140,7 +183,7 @@ export default function HomePage() {
             </Label>
             <Input
               id="title"
-              placeholder="例如：张三·产品经理·2024"
+              placeholder="例如：张三·产品经理·2025"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
@@ -178,19 +221,18 @@ function ResumeCard({ resume, onEdit, onCopy, onDelete, formatDate }: ResumeCard
 
   return (
     <div
-      className="bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:shadow-md hover:border-gray-300 transition-all group"
+      className="bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-lg hover:border-gray-300 transition-all duration-200 group"
       onClick={onEdit}
     >
-      {/* 预览缩略图 */}
+      {/* 简历预览缩略图 */}
       <div className="w-full h-40 bg-gray-50 border-b border-gray-100 relative overflow-hidden px-4 py-3">
-        {/* 模拟简历内容预览 */}
         <div className="scale-[0.45] origin-top-left w-[222%]">
           <div style={{ fontFamily: 'sans-serif' }}>
             <div className="text-2xl font-bold text-gray-900 mb-1">
               {basicInfo.name || '未填写姓名'}
             </div>
             {basicInfo.position && (
-              <div className="text-sm text-gray-600 mb-1">{basicInfo.position}</div>
+              <div className="text-sm text-gray-500 mb-1">{basicInfo.position}</div>
             )}
             {(basicInfo.phone || basicInfo.email) && (
               <div className="text-xs text-gray-400 flex gap-4 mb-2">
@@ -198,11 +240,11 @@ function ResumeCard({ resume, onEdit, onCopy, onDelete, formatDate }: ResumeCard
                 {basicInfo.email && <span>{basicInfo.email}</span>}
               </div>
             )}
-            <div className="border-t border-gray-300 pt-2 mt-1">
+            <div className="border-t border-gray-200 pt-2 mt-1">
               <div className="text-sm font-bold text-gray-800 mb-1">工作经历</div>
               {resume.data.workExperience.slice(0, 2).map((w) => (
                 <div key={w.id} className="text-xs text-gray-500 mb-0.5">
-                  {w.company} · {w.position}
+                  {w.company}{w.position ? ` · ${w.position}` : ''}
                 </div>
               ))}
               {resume.data.workExperience.length === 0 && (
@@ -211,29 +253,30 @@ function ResumeCard({ resume, onEdit, onCopy, onDelete, formatDate }: ResumeCard
             </div>
           </div>
         </div>
+        {/* hover 遮罩 */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.03] transition-colors" />
       </div>
 
-      {/* 信息 + 操作按钮 */}
-      <div className="px-4 py-3">
+      {/* 卡片信息 + 操作 */}
+      <div className="px-4 py-3.5">
         <h3 className="font-semibold text-gray-900 mb-0.5 truncate text-sm">{resume.title}</h3>
-        <p className="text-xs text-gray-400 mb-3">最后编辑：{formatDate(resume.updatedAt)}</p>
-        {/* 操作按钮 */}
+        <p className="text-xs text-gray-400 mb-3.5">最后编辑：{formatDate(resume.updatedAt)}</p>
         <div className="flex gap-2">
           <button
             onClick={onEdit}
-            className="flex-1 text-xs py-1.5 border border-gray-200 rounded text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+            className="flex-1 text-xs py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors"
           >
             编辑
           </button>
           <button
             onClick={onCopy}
-            className="flex-1 text-xs py-1.5 border border-gray-200 rounded text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+            className="flex-1 text-xs py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors"
           >
             复制
           </button>
           <button
             onClick={onDelete}
-            className="flex-1 text-xs py-1.5 border border-gray-200 rounded text-red-400 hover:bg-red-50 hover:border-red-200 transition-colors"
+            className="flex-1 text-xs py-1.5 border border-gray-200 rounded-lg text-red-400 hover:bg-red-50 hover:border-red-200 transition-colors"
           >
             删除
           </button>
