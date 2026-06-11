@@ -86,3 +86,18 @@ export async function deleteResume(id: string): Promise<void> {
   const db = await getDB()
   await db.delete(STORE_NAME, id)
 }
+
+/** 用已有数据创建简历（用于导入场景） */
+export async function createResumeWithData(title: string, data: ResumeData): Promise<ResumeRecord> {
+  const db = await getDB()
+  const now = Date.now()
+  const record: ResumeRecord = {
+    id: `resume_${now}_${Math.random().toString(36).slice(2, 9)}`,
+    title,
+    createdAt: now,
+    updatedAt: now,
+    data: JSON.parse(JSON.stringify(data)),
+  }
+  await db.put(STORE_NAME, record)
+  return record
+}
