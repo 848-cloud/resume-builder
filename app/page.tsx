@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getAllResumes, createResume, deleteResume, copyResume } from '@/lib/db'
-import { extractTextFromFile, parseResumeText, summarizeParsed } from '@/lib/parseResume'
-import type { ResumeRecord, ResumeData } from '@/types/resume'
+import type { ResumeRecord } from '@/types/resume'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -25,16 +24,6 @@ export default function HomePage() {
   const [showCreate, setShowCreate] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [creating, setCreating] = useState(false)
-
-  // 导入弹窗
-  const [showImport, setShowImport] = useState(false)
-  const [importFile, setImportFile] = useState<File | null>(null)
-  const [importTitle, setImportTitle] = useState('')
-  const [importing, setImporting] = useState(false)
-  const [importPreview, setImportPreview] = useState<string>('')
-  const [importError, setImportError] = useState<string>('')
-  const [parsedData, setParsedData] = useState<ResumeData | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const loadResumes = async () => {
     try {
@@ -61,58 +50,6 @@ export default function HomePage() {
       setShowCreate(false)
       setNewTitle('')
     }
-  }
-
-  // ── 导入文件选择 ──
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setImportFile(file)
-    setImportError('')
-    setImportPreview('')
-    setParsedData(null)
-
-    // 自动填充标题（去掉扩展名）
-    const nameWithoutExt = file.name.replace(/\.[^.]+$/, '')
-    setImportTitle(nameWithoutExt)
-
-    // 开始解析预览
-    setImporting(true)
-    try {
-      const text = await extractTextFromFile(file)
-      const data = parseResumeText(text)
-      setParsedData(data)
-      setImportPreview(summarizeParsed(data))
-    } catch (err) {
-      setImportError(err instanceof Error ? err.message : '解析失败，请检查文件格式')
-    } finally {
-      setImporting(false)
-    }
-  }
-
-  // ── 确认导入 ──
-  const handleImportConfirm = async () => {
-    if (!parsedData || !importTitle.trim()) return
-    setImporting(true)
-    try {
-      const { createResumeWithData } = await import('@/lib/db')
-      const record = await createResumeWithData(importTitle.trim(), parsedData)
-      router.push(`/editor/${record.id}`)
-    } finally {
-      setImporting(false)
-      resetImport()
-    }
-  }
-
-  const resetImport = () => {
-    setShowImport(false)
-    setImportFile(null)
-    setImportTitle('')
-    setImportPreview('')
-    setImportError('')
-    setParsedData(null)
-    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   // ── 删除 / 复制 ──
@@ -170,12 +107,6 @@ export default function HomePage() {
             >
               新建简历
             </button>
-            <button
-              onClick={() => setShowImport(true)}
-              className="px-8 py-3 bg-white/20 text-white font-semibold text-sm rounded-full border border-white/40 hover:bg-white/30 transition-all shadow-lg active:scale-95 backdrop-blur-sm"
-            >
-              导入简历
-            </button>
           </div>
         </div>
       </section>
@@ -192,7 +123,7 @@ export default function HomePage() {
               </svg>
             </div>
             <h2 className="text-lg font-semibold text-gray-600 mb-2">还没有简历</h2>
-            <p className="text-gray-400 text-sm mb-7">在上方新建或导入一份简历，开始编辑</p>
+            <p className="text-gray-400 text-sm mb-7">在上方新建一份简历，开始编辑</p>
           </div>
         ) : (
           <div>
@@ -251,103 +182,6 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
 
-      {/* ── 导入简历弹窗 ── */}
-      <Dialog open={showImport} onOpenChange={(open) => { if (!open) resetImport() }}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>导入简历</DialogTitle>
-          </DialogHeader>
-
-          <div className="py-2 space-y-5">
-            {/* 文件上传区 */}
-            <div>
-              <Label className="text-sm text-gray-600 mb-2 block">选择文件</Label>
-              <div
-                className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {importFile ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-medium text-gray-800">{importFile.name}</p>
-                      <p className="text-xs text-gray-400">{(importFile.size / 1024).toFixed(1)} KB</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <svg className="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <p className="text-sm text-gray-500 mb-1">点击选择文件</p>
-                    <p className="text-xs text-gray-400">支持 PDF、Word (.docx)、纯文本 (.txt)</p>
-                  </div>
-                )}
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.doc,.docx,.txt"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </div>
-
-            {/* 解析状态 */}
-            {importing && (
-              <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                正在识别简历内容...
-              </div>
-            )}
-
-            {importError && (
-              <div className="text-sm text-red-500 bg-red-50 rounded-lg px-4 py-3">
-                ⚠️ {importError}
-              </div>
-            )}
-
-            {importPreview && !importing && (
-              <div className="bg-green-50 border border-green-100 rounded-lg px-4 py-3">
-                <p className="text-xs font-medium text-green-700 mb-1">✓ 识别成功</p>
-                <p className="text-xs text-green-600">{importPreview}</p>
-                <p className="text-xs text-gray-400 mt-2">导入后可在编辑页继续完善内容</p>
-              </div>
-            )}
-
-            {/* 简历名称 */}
-            {parsedData && (
-              <div>
-                <Label className="text-sm text-gray-600 mb-2 block">简历名称</Label>
-                <Input
-                  placeholder="给这份简历起个名字"
-                  value={importTitle}
-                  onChange={(e) => setImportTitle(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleImportConfirm()}
-                />
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={resetImport}>取消</Button>
-            <Button
-              onClick={handleImportConfirm}
-              disabled={!parsedData || !importTitle.trim() || importing}
-              className="bg-gray-900 hover:bg-gray-700 text-white"
-            >
-              {importing ? '导入中...' : '导入并编辑'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
