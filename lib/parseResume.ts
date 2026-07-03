@@ -44,7 +44,6 @@ async function extractFromPDF(file: File): Promise<string> {
   const pdf = await pdfjsLib.getDocument({
     data: arrayBuffer,
     useWorkerFetch: false,
-    isEvalSupported: false,
     useSystemFonts: true,
   }).promise
   const texts: string[] = []
