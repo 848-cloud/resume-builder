@@ -44,3 +44,13 @@ next-env.d.ts
 public/fonts/*.ttc
 public/fonts/*.ttf
 public/fonts/*.otf
+
+# OpenNext
+.open-next
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+
+!.env.example
